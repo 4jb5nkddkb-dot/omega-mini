@@ -32,5 +32,9 @@ Homepage = "https://github.com/4jb5nkddkb-dot/omega-mini"
 Repository = "https://github.com/4jb5nkddkb-dot/omega-mini"
 Issues = "https://github.com/4jb5nkddkb-dot/omega-mini/issues"
 
-[tool.setuptools]
-py-modules = ["omega"]
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omega*"]
+
+[tool.setuptools.package-dir]
+"" = "src"

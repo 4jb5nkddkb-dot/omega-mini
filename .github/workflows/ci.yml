@@ -9,9 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: omega-mini
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
@@ -20,9 +17,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install package
+        run: pip install -e .
       - name: Run self-test
-        run: python omega.py
+        run: python -c "from omega import Omega, Prediction, StaticEnv; omega = Omega(secret='self-test-secret'); owner = omega.owner_handle(); omega.set_goal(owner, {'temperature': 22.0}); omega.set_limits(owner, hard_min={'temperature': 10.0}, hard_max={'temperature': 30.0}); token = omega.new_token(owner, 'measure'); env = StaticEnv({'temperature': 22.0}); result = omega.run(env, token, prediction=Prediction(expected={'temperature': 22.0}, conf=0.95)); assert result.decision.name == 'APPLY'; assert env.calls == 1; assert omega.verify_audit(); print('Omega self-test: PASS')"
       - name: Run standard-library test suite
-        run: python test_omega.py
+        run: python tests/test_omega.py
       - name: Run experiment suite
-        run: python experiment.py --rounds 20
+        run: python experiments/experiment.py --rounds 20
